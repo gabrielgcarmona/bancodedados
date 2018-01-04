@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mysql.h>
+#include <locale.h>
+#include <windows.h>
 
 #define HOST "localhost"
 #define USER "root"
@@ -21,7 +23,8 @@ int main(void)
 	void cadastros();
 	void consultas();
 	
-	
+	//setlocale(LC_ALL,"portuguese");
+	//SetConsoleOutputCP(65001);
 	while (sair == 0){
 		system("cls");
 		printf("------- Menu -------\n");
@@ -29,7 +32,7 @@ int main(void)
 		printf("2 - Consultar\n");
 		printf("3 - Sair\n");
 		printf("--------------------\n\n");
-		printf("Digite uma opcao: ");
+		printf("Digite uma opção: ");
 		opcao = getch();
 		switch(opcao){
 			case '1': 
@@ -86,17 +89,20 @@ void consultas(){
 }
 
 void cadastra(){
-	char descricao[200], serie[5], pedido[5] ;
+	char descricao[200], serie[5], pedido[5],car ;
 	int ano,dia,mes;
 	int tipo,estado,cliente,categoria;
 	char query[300];
 	void enviarcadastro(char* query);
 	
+	setlocale(LC_ALL,"portuguese");
 	system("cls");
 	printf("Descricao: ");
 	fgets(descricao,200,stdin);
+	
 	if(descricao[strlen(descricao) - 1] == '\n')
 		descricao[strlen(descricao) - 1] = '\0';
+	printf("%s",descricao);
 	printf("Serie: ");
 	fgets(serie,5,stdin);
 	if(serie[strlen(serie) - 1] == '\n')
@@ -108,7 +114,7 @@ void cadastra(){
 	fflush(stdin);
 	printf("Data da encomenda: ");
 	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
-	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%4d-%2d-%2d',",descricao,serie,pedido,ano,mes,dia);
+	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%4d-%02d-%02d'",descricao,serie,pedido,ano,mes,dia);
 	printf("Data de entrega: ");
 	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
 	printf("Tipo de produto: ");
@@ -119,10 +125,11 @@ void cadastra(){
 	scanf("%d",&cliente);
 	printf("Categoria do produto: ");
 	scanf("%d",&categoria);
-	sprintf(query,"%s'%4d-%2d-%2d','%d','%d','%d','%d');",query,ano,mes,dia,tipo,estado,cliente,categoria);
+	sprintf(query,"%s,'%4d-%02d-%02d','%d','%d','%d','%d');",query,ano,mes,dia,tipo,estado,cliente,categoria);
 	system("cls");
 	printf("%s",query);
 	getch();
+	system("cls");
 	enviarcadastro(query);
 	return;
 	
@@ -155,14 +162,14 @@ void ligamysql(){
            //escreve na tela os nomes dos campos dando
            //um tab somente
            campos = mysql_fetch_fields(resp);
-           for (conta=0;conta<mysql_num_fields(resp);conta++) {
+           /*for (conta=0;conta<mysql_num_fields(resp);conta++) {
               printf("%s",(campos[conta]).name);
               getch();
               if (mysql_num_fields(resp)>1)
                   printf("\t");
               }
          
-              printf("\n");   
+              printf("\n");   */
 
               //enquanto retonrnar registros, conta até o
               //número de colunas que a tabela tem e escreve na
@@ -171,9 +178,7 @@ void ligamysql(){
               while ((linhas=mysql_fetch_row(resp)) != NULL)
               {
                  for (conta=0;conta<mysql_num_fields(resp);conta++){
-				 	if(conta == 0)
-				 		printf("%s",linhas[conta]);
-                    //printf("%s\t",linhas[conta]);
+                    printf("%s\t",linhas[conta]);
                 }
                     getch();
                  printf("\n");
