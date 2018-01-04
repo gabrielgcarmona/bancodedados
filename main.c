@@ -5,13 +5,19 @@
 #define HOST "localhost"
 #define USER "root"
 #define PASS "carmona2017"
-#define DB "teste"
+#define DB "produtos"
+
+typedef struct{
+	char id[2], nome[10],sexo[2];
+} retorno;
+
+void ligamysql();
 
 int main(void)
 {
 	int sair = 0;
 	char opcao;
-	void ligamysql();
+	
 	void cadastros();
 	void consultas();
 	
@@ -39,26 +45,31 @@ int main(void)
 				printf("\nDigite uma alternativa valida!\n");
 				system("pause");
 		}
-		ligamysql();
+		
 	}
    	return 0;
 }
 
 void cadastros(){
 	int sair = 0;
+	void cadastra();
 	char opcao;
 		system("cls");
 		printf("------- Cadastros -------\n");
 		printf("1 - Cliente\n");
 		printf("2 - Estado\n");
 		printf("3 - Tipo\n");
-		printf("4 - Produto\n");
-		printf("5 - Sair\n");
+		printf("4 - Categoria\n");
+		printf("5 - Produto\n");
+		printf("6 - Sair\n");
 		printf("-------------------\n\n");
 		printf("Digite uma opcao: ");
 		opcao = getch();
 		switch(opcao){
 			case '5':
+				cadastra();
+				break;
+			case '6':
 				sair = 1;
 				break;
 			default: 
@@ -70,17 +81,62 @@ void cadastros(){
 }
 
 void consultas(){
+	ligamysql();
 	return;
 }
+
+void cadastra(){
+	char descricao[200], serie[5], pedido[5] ;
+	int ano,dia,mes;
+	int tipo,estado,cliente,categoria;
+	char query[300];
+	void enviarcadastro(char* query);
+	
+	system("cls");
+	printf("Descricao: ");
+	fgets(descricao,200,stdin);
+	if(descricao[strlen(descricao) - 1] == '\n')
+		descricao[strlen(descricao) - 1] = '\0';
+	printf("Serie: ");
+	fgets(serie,5,stdin);
+	if(serie[strlen(serie) - 1] == '\n')
+		serie[strlen(serie) - 1] = '\0';
+	printf("N Pedido: ");
+	fgets(pedido,5,stdin);
+	if(pedido[strlen(pedido) - 1] == '\n')
+		pedido[strlen(pedido) - 1] = '\0';
+	fflush(stdin);
+	printf("Data da encomenda: ");
+	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
+	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%4d-%2d-%2d',",descricao,serie,pedido,ano,mes,dia);
+	printf("Data de entrega: ");
+	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
+	printf("Tipo de produto: ");
+	scanf("%d",&tipo);
+	printf("Status da mercadoria: ");
+	scanf("%d",&estado);
+	printf("Cliente: ");
+	scanf("%d",&cliente);
+	printf("Categoria do produto: ");
+	scanf("%d",&categoria);
+	sprintf(query,"%s'%4d-%2d-%2d','%d','%d','%d','%d');",query,ano,mes,dia,tipo,estado,cliente,categoria);
+	system("cls");
+	printf("%s",query);
+	getch();
+	enviarcadastro(query);
+	return;
+	
+}
+
 void ligamysql(){
 	
 	
-	   MYSQL conexao; 
-   MYSQL_RES *resp;
-   MYSQL_ROW linhas;
-   MYSQL_FIELD *campos;
-   char query[]="SELECT * FROM aprendendo;";
-   int conta; //Contador comum
+	MYSQL conexao; 
+   	MYSQL_RES *resp;
+   	MYSQL_ROW linhas;
+   	MYSQL_FIELD *campos;
+   	char query[]="SELECT * FROM produto;";
+   	int conta; //Contador comum
 
 
 	
@@ -114,8 +170,11 @@ void ligamysql(){
               //pegar outro registro
               while ((linhas=mysql_fetch_row(resp)) != NULL)
               {
-                 for (conta=0;conta<mysql_num_fields(resp);conta++)
-                    printf("%s",linhas[conta]);
+                 for (conta=0;conta<mysql_num_fields(resp);conta++){
+				 	if(conta == 0)
+				 		printf("%s",linhas[conta]);
+                    //printf("%s\t",linhas[conta]);
+                }
                     getch();
                  printf("\n");
               }
@@ -132,4 +191,29 @@ void ligamysql(){
    }
    
 	return ;
+}
+
+void enviarcadastro(char* query)
+{
+     MYSQL conexao;
+     int res;
+
+     mysql_init(&conexao);
+     if ( mysql_real_connect(&conexao, HOST, USER, PASS, DB, 0, NULL, 0) )
+     {
+        
+       
+        res = mysql_query(&conexao,query);
+
+        if (!res) printf("Registros inseridos %d\n", mysql_affected_rows(&conexao));
+        else printf("Erro na inserção %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+
+        mysql_close(&conexao);
+    }
+    else
+    {
+        printf("Falha de conexao\n");
+        printf("Erro %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+     }
+     getch();
 }
