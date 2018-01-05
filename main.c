@@ -3,6 +3,8 @@
 #include <mysql.h>
 #include <locale.h>
 #include <windows.h>
+#include <ctype.h>
+#include <conio.c>
 
 #define HOST "localhost"
 #define USER "root"
@@ -15,15 +17,17 @@ typedef struct{
 
 void ligamysql();
 
+void le(char* nome);
+
 int main(void)
 {
 	int sair = 0;
 	char opcao;
-	
+
 	void cadastros();
 	void consultas();
-	
-	//setlocale(LC_ALL,"portuguese");
+
+	setlocale(LC_ALL,"portuguese");
 	//SetConsoleOutputCP(65001);
 	while (sair == 0){
 		system("cls");
@@ -32,10 +36,10 @@ int main(void)
 		printf("2 - Consultar\n");
 		printf("3 - Sair\n");
 		printf("--------------------\n\n");
-		printf("Digite uma opзгo: ");
+		printf("Digite uma op\xe7гo: ");
 		opcao = getch();
 		switch(opcao){
-			case '1': 
+			case '1':
 				cadastros();
 				break;
 			case '2':
@@ -44,11 +48,11 @@ int main(void)
 			case '3':
 				sair = 1;
 				break;
-			default: 
+			default:
 				printf("\nDigite uma alternativa valida!\n");
 				system("pause");
 		}
-		
+
 	}
    	return 0;
 }
@@ -75,11 +79,11 @@ void cadastros(){
 			case '6':
 				sair = 1;
 				break;
-			default: 
+			default:
 				system("cls");
 				printf("\nDigite uma alternativa valida!\n");
 				getch();
-				
+
 		}
 }
 
@@ -94,19 +98,15 @@ void cadastra(){
 	int tipo,estado,cliente,categoria;
 	char query[300];
 	void enviarcadastro(char* query);
-	
-	setlocale(LC_ALL,"portuguese");
+
+
 	system("cls");
-	printf("Descricao: ");
-	fgets(descricao,200,stdin);
-	
-	if(descricao[strlen(descricao) - 1] == '\n')
-		descricao[strlen(descricao) - 1] = '\0';
-	printf("%s",descricao);
-	printf("Serie: ");
-	fgets(serie,5,stdin);
-	if(serie[strlen(serie) - 1] == '\n')
-		serie[strlen(serie) - 1] = '\0';
+	printf("Descricao: ______________________________________\n");
+	printf("Serie: ____\n");
+    le(descricao);
+
+    le(serie);
+
 	printf("N Pedido: ");
 	fgets(pedido,5,stdin);
 	if(pedido[strlen(pedido) - 1] == '\n')
@@ -132,13 +132,81 @@ void cadastra(){
 	system("cls");
 	enviarcadastro(query);
 	return;
-	
+
+}
+void le(char* nome){
+    char caracter;
+    int aux = 0;
+    system("cls");
+    do{
+
+
+        caracter = getch();
+        printf("%x",caracter);
+        getch();
+        /*
+        if (caracter != 13){
+
+            switch(caracter){
+            case '\x87':
+            case '\x80':
+                caracter = 'З';
+                break;
+            case '\xc6':
+            case '\xc7':
+                caracter = 'Г';
+                break;
+            case '\xe4':
+            case '\xe5':
+                caracter = 'Х';
+                break;
+            case '\x83':
+            case '\xb6':
+                caracter = 'В';
+                break;
+            case '\xa0':
+            case '\xb5':
+                caracter = 'Б';
+                break;
+            case '\xa2':
+            case '\xe0':
+                caracter = 'У';
+                break;
+            case '\x82':
+            case '\x90':
+                caracter = 'Й';
+                break;
+            case '\xa1':
+            case '\xd6':
+                caracter = 'Н';
+                break;
+            case '\xa3':
+            case '\xe9':
+                caracter = 'Ъ';
+                break;
+            case '\x93':
+            case '\xe2':
+                caracter = 'Ф';
+                break;
+            case '\x85':
+            case '\xb7':
+                caracter = 'А';
+                break;
+            default:
+                caracter = toupper(caracter);
+            }
+            nome[aux] = caracter;
+            aux++;
+        }else
+            nome[aux]= '\0';*/
+
+    }while (caracter != 13);
 }
 
 void ligamysql(){
-	
-	
-	MYSQL conexao; 
+
+
+	MYSQL conexao;
    	MYSQL_RES *resp;
    	MYSQL_ROW linhas;
    	MYSQL_FIELD *campos;
@@ -146,7 +214,7 @@ void ligamysql(){
    	int conta; //Contador comum
 
 
-	
+
    mysql_init(&conexao);
    if (mysql_real_connect(&conexao,HOST,USER,PASS,DB,0,NULL,0))
    {
@@ -168,7 +236,7 @@ void ligamysql(){
               if (mysql_num_fields(resp)>1)
                   printf("\t");
               }
-         
+
               printf("\n");   */
 
               //enquanto retonrnar registros, conta atй o
@@ -188,13 +256,13 @@ void ligamysql(){
         }
         mysql_close(&conexao);
    }
-   else 
+   else
    {
       printf("Conexao Falhou\n");
       if (mysql_errno(&conexao))
          printf("Erro %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
    }
-   
+
 	return ;
 }
 
@@ -206,8 +274,8 @@ void enviarcadastro(char* query)
      mysql_init(&conexao);
      if ( mysql_real_connect(&conexao, HOST, USER, PASS, DB, 0, NULL, 0) )
      {
-        
-       
+
+
         res = mysql_query(&conexao,query);
 
         if (!res) printf("Registros inseridos %d\n", mysql_affected_rows(&conexao));
