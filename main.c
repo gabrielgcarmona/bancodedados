@@ -13,11 +13,15 @@
 
 typedef struct{
 	char id[2], nome[10],sexo[2];
-} retorno;
+} retorn;
 
 void ligamysql();
 
 void le(char* nome);
+
+
+
+
 
 int main(void)
 {
@@ -135,15 +139,17 @@ void cadastra(){
 
 }
 void le(char* nome){
-    char caracter;
+
+    char caracter,car;
     int aux = 0;
     system("cls");
+
     do{
 
-
+        //scanf("%c%c",&car,&caracter);
         caracter = getch();
-        printf("%x",caracter);
-        getch();
+        printf("%d\n",caracter);
+        //getch();
         /*
         if (caracter != 13){
 
@@ -169,7 +175,6 @@ void le(char* nome){
                 caracter = 'Á';
                 break;
             case '\xa2':
-            case '\xe0':
                 caracter = 'Ó';
                 break;
             case '\x82':
