@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mysql.h>
+#include <string.h>
 #include <locale.h>
 #include <windows.h>
 #include <ctype.h>
@@ -51,12 +52,15 @@ int main(void)
 	while (sair == 0){
 		system("cls");
 		textbackground(9);
-		pulachar(23);
+		pulachar(11);
 		printf("MENU");
-		pulachar(23);
-		printf("\n1 - Cadastrar\n");
-		printf("2 - Consultar\n");
-		printf("3 - Sair\n");
+		pulachar(11);
+		gotoxy(1,2);
+		pulachar(26);
+		gotoxy(1,3);
+		printf("CADASTRAR");
+		printf("CONSULTAR");
+		printf("  SAIR   ");
 		printf("--------------------\n\n");
 		printf("Digite uma op\xe7ão: ");
 		opcao = getch();
