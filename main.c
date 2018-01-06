@@ -4,7 +4,7 @@
 #include <locale.h>
 #include <windows.h>
 #include <ctype.h>
-#include <conio.c>
+#include "conio.c"
 
 #define HOST "localhost"
 #define USER "root"
@@ -19,24 +19,42 @@ void ligamysql();
 
 void le(char* nome);
 
+void pulachar( int pula){
+        int i;
 
+        for(i=0;i<pula;i++)
+            putchar(' ');
+    }
 
 
 
 int main(void)
 {
-	int sair = 0;
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    SMALL_RECT sr;
+    COORD consoleSize;
+
+    consoleSize.X = 500; consoleSize.Y = 250;
+    sr.Top=sr.Left=0;
+    sr.Right=99; sr.Bottom=49;
+    SetConsoleWindowInfo(console, TRUE, &sr);
+    SetConsoleScreenBufferSize(console, consoleSize);
+	int sair = 0,posicao = 0;
 	char opcao;
 
 	void cadastros();
 	void consultas();
 
+
 	setlocale(LC_ALL,"portuguese");
 	//SetConsoleOutputCP(65001);
 	while (sair == 0){
 		system("cls");
-		printf("------- Menu -------\n");
-		printf("1 - Cadastrar\n");
+		textbackground(9);
+		pulachar(23);
+		printf("MENU");
+		pulachar(23);
+		printf("\n1 - Cadastrar\n");
 		printf("2 - Consultar\n");
 		printf("3 - Sair\n");
 		printf("--------------------\n\n");
@@ -148,7 +166,8 @@ void le(char* nome){
 
         //scanf("%c%c",&car,&caracter);
         caracter = getch();
-        printf("%d\n",caracter);
+
+        printf("%c",caracter);
         //getch();
         /*
         if (caracter != 13){
