@@ -13,13 +13,14 @@
 #define DB "produtos"
 
 typedef struct{
-	char id[2], nome[10],sexo[2];
+	int tipo,estado,cliente,categoria;
+	char id[5], descricao[200], serie[5], pedido[5], ano_encomenda[5],dia_encomenda[3],mes_encomenda[3],ano_entrega[5],dia_entrega[3],mes_entrega[3];
 } retorn;
 
 void ligamysql();
-
+void imprimeMenu();
 void le(char* nome);
-
+void printOp(int opcao,int cor);
 void pulachar( int pula){
         int i;
 
@@ -27,19 +28,20 @@ void pulachar( int pula){
             putchar(' ');
     }
 
-
-
-int main(void)
-{
+void tamTerminal(int x, int y){
     HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
     SMALL_RECT sr;
     COORD consoleSize;
 
-    consoleSize.X = 500; consoleSize.Y = 250;
+    consoleSize.X = x; consoleSize.Y = y;
     sr.Top=sr.Left=0;
-    sr.Right=99; sr.Bottom=49;
+    sr.Right=x; sr.Bottom=y;
     SetConsoleWindowInfo(console, TRUE, &sr);
     SetConsoleScreenBufferSize(console, consoleSize);
+}
+
+int main(void)
+{
 	int sair = 0,posicao = 0;
 	char opcao;
 
@@ -48,69 +50,236 @@ int main(void)
 
 
 	setlocale(LC_ALL,"portuguese");
+	tamTerminal(26,10);
 	//SetConsoleOutputCP(65001);
+	imprimeMenu();
 	while (sair == 0){
-		system("cls");
-		textbackground(9);
-		pulachar(11);
-		printf("MENU");
-		pulachar(11);
-		gotoxy(1,2);
-		pulachar(26);
-		gotoxy(1,3);
-		printf("CADASTRAR");
-		printf("CONSULTAR");
-		printf("  SAIR   ");
-		printf("--------------------\n\n");
-		printf("Digite uma op\xe7ão: ");
 		opcao = getch();
 		switch(opcao){
-			case '1':
-				cadastros();
-				break;
-			case '2':
-				consultas();
-				break;
-			case '3':
-				sair = 1;
-				break;
-			default:
-				printf("\nDigite uma alternativa valida!\n");
-				system("pause");
-		}
+            case 13:
+                switch(posicao){
+                    case 0:
+                        cadastros();
+                        break;
+                    case 1:
+                        consultas();
+                        break;
+                    case 2:
+                        sair = 1;
 
+                }
+                break;
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x48':
+                        if(posicao > 0){
+                            posicao--;
+                        }else
+                            posicao = 2;
+                        break;
+                    case '\x50':
+                        if(posicao < 2){
+                            posicao++;
+                        }else
+                            posicao = 0;
+
+                }
+		}
+		switch(posicao){
+            case 0:
+                printOp(0,8);
+                printOp(1,9);
+                printOp(2,9);
+                break;
+            case 1:
+                printOp(0,9);
+                printOp(1,8);
+                printOp(2,9);
+                break;
+            case 2:
+                printOp(0,9);
+                printOp(1,9);
+                printOp(2,8);
+                break;
+		}
 	}
+
    	return 0;
 }
 
+void imprimeMenu(){
+    textbackground(9);
+    system("cls");
+    textbackground(8);
+    pulachar(11);
+    printf("MENU");
+    pulachar(12);
+    textbackground(9);
+    printOp(0,8);
+    printOp(1,9);
+    printOp(2,9);
+    return;
+
+}
+
+void imprimeMenu2(){
+    textbackground(9);
+    system("cls");
+    textbackground(8);
+    pulachar(9);
+    printf("CADASTROS");
+    pulachar(9);
+    textbackground(9);
+    printOp(3,8);
+    printOp(4,9);
+    printOp(5,9);
+    printOp(6,9);
+    printOp(7,9);
+    printOp(8,9);
+    return;
+
+}
+
+void printOp(int opcao,int cor){
+    textbackground(cor);
+    switch(opcao){
+        case 0:
+            gotoxy(10,4);
+            printf("CADASTRAR");
+            break;
+        case 1:
+            gotoxy(10,6);
+            printf("CONSULTAR");
+            break;
+        case 2:
+            gotoxy(12,8);
+            printf("SAIR");
+            break;
+        case 3:
+            gotoxy(11,4);
+            printf("PRODUTO");
+            break;
+        case 4:
+            gotoxy(11,5);
+            printf("CLIENTE");
+            break;
+        case 5:
+            gotoxy(10,6);
+            printf("CATEGORIA");
+            break;
+        case 6:
+            gotoxy(9,7);
+            printf("TIPO DE PROD");
+            break;
+        case 7:
+            gotoxy(11,8);
+            printf("ESTADO");
+            break;
+        case 8:
+            gotoxy(11,9);
+            printf("VOLTAR");
+            break;
+    }
+}
+
 void cadastros(){
-	int sair = 0;
+	int sair = 0,posicao = 0;
 	void cadastra();
 	char opcao;
-		system("cls");
-		printf("------- Cadastros -------\n");
-		printf("1 - Cliente\n");
-		printf("2 - Estado\n");
-		printf("3 - Tipo\n");
-		printf("4 - Categoria\n");
-		printf("5 - Produto\n");
-		printf("6 - Sair\n");
-		printf("-------------------\n\n");
-		printf("Digite uma opcao: ");
+	imprimeMenu2();
+	while (sair == 0){
 		opcao = getch();
 		switch(opcao){
-			case '5':
-				cadastra();
-				break;
-			case '6':
-				sair = 1;
-				break;
-			default:
-				system("cls");
-				printf("\nDigite uma alternativa valida!\n");
-				getch();
+            case 13:
+                switch(posicao){
+                    case 0:
+                        tamTerminal(50,20);
+                        imprimeFicha();
+                        cadastra();
+                        break;
+                    case 1:
+
+                        break;
+                    case 5:
+
+                        sair = 1;
+                        imprimeMenu();
+                        posicao = 6;
+
+                }
+                break;
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x48':
+                        if(posicao > 0){
+                            posicao--;
+                        }else
+                            posicao = 5;
+                        break;
+                    case '\x50':
+                        if(posicao < 5){
+                            posicao++;
+                        }else
+                            posicao = 0;
+
+                }
+		}
+		switch(posicao){
+            case 0:
+                printOp(3,8);
+                printOp(4,9);
+                printOp(5,9);
+                printOp(6,9);
+                printOp(7,9);
+                printOp(8,9);
+                break;
+            case 1:
+                printOp(3,9);
+                printOp(4,8);
+                printOp(5,9);
+                printOp(6,9);
+                printOp(7,9);
+                printOp(8,9);
+                break;
+            case 2:
+                printOp(3,9);
+                printOp(4,9);
+                printOp(5,8);
+                printOp(6,9);
+                printOp(7,9);
+                printOp(8,9);
+                break;
+            case 3:
+                printOp(3,9);
+                printOp(4,9);
+                printOp(5,9);
+                printOp(6,8);
+                printOp(7,9);
+                printOp(8,9);
+                break;
+            case 4:
+                printOp(3,9);
+                printOp(4,9);
+                printOp(5,9);
+                printOp(6,9);
+                printOp(7,8);
+                printOp(8,9);
+                break;
+            case 5:
+                printOp(3,9);
+                printOp(4,9);
+                printOp(5,9);
+                printOp(6,9);
+                printOp(7,9);
+                printOp(8,8);
+
 
 		}
+	}
+
+
 }
 
 void consultas(){
@@ -119,37 +288,39 @@ void consultas(){
 }
 
 void cadastra(){
-	char descricao[200], serie[5], pedido[5],car ;
+    retorn ficha;
+	char opcao ;
 	int ano,dia,mes;
 	int tipo,estado,cliente,categoria;
 	char query[300];
 	void enviarcadastro(char* query);
+    void imprimeFicha();
 
 
-	system("cls");
-	printf("Descricao: ______________________________________\n");
-	printf("Serie: ____\n");
-    le(descricao);
+    imprimeFicha();
+    textcolor(7);
+    getch();
+    le(ficha.descricao);
 
     le(serie);
 
-	printf("N Pedido: ");
+
 	fgets(pedido,5,stdin);
 	if(pedido[strlen(pedido) - 1] == '\n')
 		pedido[strlen(pedido) - 1] = '\0';
 	fflush(stdin);
-	printf("Data da encomenda: ");
+
 	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
-	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%4d-%02d-%02d'",descricao,serie,pedido,ano,mes,dia);
-	printf("Data de entrega: ");
+	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%4d-%02d-%02d','%4d-%02d-%02d','%d','%d','%d','%d');",ficha.descricao,ficha.serie,ficha.pedido,ficha.ano_encomenda,ficha.mes_encomenda,ficha.dia_encomenda,ficha.ano_entrega,ficha.mes_entrega,ficha.dia_entrega,ficha.tipo,ficha.estado,ficha.cliente,ficha.categoria);
+
 	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
-	printf("Tipo de produto: ");
+
 	scanf("%d",&tipo);
-	printf("Status da mercadoria: ");
+
 	scanf("%d",&estado);
-	printf("Cliente: ");
+
 	scanf("%d",&cliente);
-	printf("Categoria do produto: ");
+
 	scanf("%d",&categoria);
 	sprintf(query,"%s,'%4d-%02d-%02d','%d','%d','%d','%d');",query,ano,mes,dia,tipo,estado,cliente,categoria);
 	system("cls");
@@ -160,6 +331,25 @@ void cadastra(){
 	return;
 
 }
+void imprimeFicha(){
+    system("cls");
+    textbackground(8);
+    pulachar(23);
+    printf("FICHA");
+    pulachar(23);
+    textbackground(9);
+    textcolor(15);
+    printf("\n\n CATEGORIA DO PRODUTO: ___________________________\n\n");
+    printf(" DESCRIÇÃO: ______________________________________\n\n");
+	printf(" SÉRIE: ____\n\n");
+	printf(" N PEDIDO:____\n\n");
+	printf(" DATA DE ENCOMENDA: __/__/____\n\n");
+	printf(" DATA DE ENTREGA: __/__/____\n\n");
+	printf(" TIPO: [ ]ENCOMENDA    [ ]PRONTA ENTREGA \n\n");
+	printf(" STATUS DA MERCADORIA: ___________________________\n\n");
+	printf(" CLIENTE: ________________________________________\n\n");
+}
+
 void le(char* nome){
 
     char caracter,car;
