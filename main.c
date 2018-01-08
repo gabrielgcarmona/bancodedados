@@ -618,10 +618,10 @@ void consultas(){
 
 void cadastra(){
     retorn ficha;
-    pesquisa* cate;
+    pesquisa* cate,estad;
 	char opcao ;
-	int ano,dia,mes,conCate,aux=0;
-	int tipo,estado,cliente,categoria;
+	int ano,dia,mes,conCate,conEst,aux=0;
+	//int tipo,estado,cliente,categoria;
 	char query[300];
 	void enviarcadastro(char* query);
     void imprimeFicha();
@@ -649,7 +649,7 @@ void cadastra(){
                             aux--;
                 }
                 break;
-            case 8:
+            case 27:
                 goto PULA;
                 break;
             case 13:
@@ -660,17 +660,92 @@ void cadastra(){
 
     }while(opcao != 13);
     gotoxy(13,5);
-    le(ficha.descricao,199);
+    if(le(ficha.descricao,199))
+        goto PULA;
     gotoxy(9,7);
-    le(ficha.serie,4);
+    if(le(ficha.serie,4))
+        goto PULA;
     gotoxy(11,9);
-    le(ficha.pedido,4);
+    if(le(ficha.pedido,4))
+        goto PULA;
     gotoxy(21,11);
-    le(ficha.dia_encomenda,2);
+    if(le(ficha.dia_encomenda,2))
+        goto PULA;
     gotoxy(24,11);
-    le(ficha.mes_encomenda,2);
+    if(le(ficha.mes_encomenda,2))
+        goto PULA;
     gotoxy(27,11);
-    le(ficha.ano_encomenda,4);
+    if(le(ficha.ano_encomenda,4))
+        goto PULA;
+    gotoxy(19,13);
+    if(le(ficha.dia_entrega,2))
+        goto PULA;
+    gotoxy(22,13);
+    if(le(ficha.mes_entrega,2))
+        goto PULA;
+    gotoxy(25,13);
+    if(le(ficha.ano_entrega,4))
+        goto PULA;
+    aux=1;
+    gotoxy(9,15);
+    do{
+        opcao = getch();
+        switch(opcao){
+            case '\xe0':
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        gotoxy(25,15);
+                        aux=2;
+                        break;
+                    case '\x4b':
+                        gotoxy(9,15);
+                        aux=1;
+                }
+                break;
+            case 27:
+                goto PULA;
+                break;
+            case 13:
+                ficha.tipo = aux;
+
+        }
+    }while(opcao != 13);
+    putchar('X');
+    aux=0;
+    free(cate);
+    cate=consulta("estado",&conCate);
+    do{
+        gotoxy(24,17);
+        pulachar(20);
+        gotoxy(24,17);
+        printf("< %s >",cate[aux].nome);
+        opcao = getch();
+        switch(opcao){
+            case '\xe0':
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        if(aux < conCate - 1)
+                            aux++;
+                        break;
+                    case '\x4b':
+                        if(aux > 0)
+                            aux--;
+                }
+                break;
+            case 27:
+                goto PULA;
+                break;
+            case 13:
+                ficha.estado = cate[aux].id;
+
+        }
+
+
+    }while(opcao != 13);
+
+
 PULA:
     free(cate);
 /*
@@ -681,6 +756,7 @@ PULA:
 	enviarcadastro(query);*/
 	textcolor(7);
 	tamTerminal(26,10);
+	imprimeMenu2();
 	return;
 
 }
@@ -699,7 +775,7 @@ void imprimeFicha(){
 	printf(" DATA DE ENCOMENDA: __/__/____\n\n");
 	printf(" DATA DE ENTREGA: __/__/____\n\n");
 	printf(" TIPO: [ ]ENCOMENDA    [ ]PRONTA ENTREGA \n\n");
-	printf(" STATUS DA MERCADORIA: ___________________________\n\n");
+	printf(" STATUS DA MERCADORIA: < >\n\n");
 	printf(" CLIENTE: ________________________________________\n\n");
 }
 
