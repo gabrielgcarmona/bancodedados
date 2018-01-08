@@ -589,7 +589,21 @@ tamTerminal(26,10);
 }
 
 void consultas(){
-	ligamysql();
+    int consulta;
+    retorn* ficha=(retorn*) malloc(sizeof(retorn));
+
+    system("cls");
+	consulta = consultaProduto(ficha);
+	if(consulta){
+        printf("%d Registros encontrados\n",consulta);
+        printf("Descrição: %s\n",ficha[0].descricao);
+        printf("Data de encomenda: %s/%s/%s\n",ficha[0].dia_encomenda,ficha[0].mes_encomenda,ficha[0].ano_encomenda);
+        printf("Data de entrega: %s/%s/%s\n",ficha[0].dia_entrega,ficha[0].mes_entrega,ficha[0].ano_entrega);
+        printf("Dados: %02d %02d %02d %02d",ficha[0].tipo,ficha[0].estado,ficha[0].cliente,ficha[0].categoria);
+        getch();
+
+	}
+
 	return;
 }
 
@@ -729,7 +743,7 @@ int le(char* nome,int maxAux){
     return 0;
 }
 
-void ligamysql(){
+int consultaProduto(retorn* ficha){
 
 
 	MYSQL conexao;
@@ -737,14 +751,13 @@ void ligamysql(){
    	MYSQL_ROW linhas;
    	MYSQL_FIELD *campos;
    	char query[]="SELECT * FROM produto;";
-   	int conta; //Contador comum
+   	int conta = 0,i=0; //Contador comum
 
 
 
    mysql_init(&conexao);
    if (mysql_real_connect(&conexao,HOST,USER,PASS,DB,0,NULL,0))
    {
-      printf("Conectado com Sucesso!\n");
       if (mysql_query(&conexao,query))
          printf("Erro: %s\n",mysql_error(&conexao));
       else
@@ -752,30 +765,64 @@ void ligamysql(){
          resp = mysql_store_result(&conexao);//recebe a consulta
         if (resp) //se houver consulta
         {
-           //passa os dados dos campos para a variável campos
-           //escreve na tela os nomes dos campos dando
-           //um tab somente
            campos = mysql_fetch_fields(resp);
-           /*for (conta=0;conta<mysql_num_fields(resp);conta++) {
-              printf("%s",(campos[conta]).name);
-              getch();
-              if (mysql_num_fields(resp)>1)
-                  printf("\t");
-              }
 
-              printf("\n");   */
-
-              //enquanto retonrnar registros, conta até o
-              //número de colunas que a tabela tem e escreve na
-              //tela com um tab, depois pula a linha e tenta
-              //pegar outro registro
               while ((linhas=mysql_fetch_row(resp)) != NULL)
               {
-                 for (conta=0;conta<mysql_num_fields(resp);conta++){
-                    printf("%s\t",linhas[conta]);
-                }
-                    getch();
-                 printf("\n");
+                  conta++;
+                 ficha=(retorn*)realloc(ficha,conta * sizeof(retorn));
+                 sprintf(ficha[conta - 1].id,"%s",linhas[0]);
+                 sprintf(ficha[conta - 1].descricao,"%s",linhas[1]);
+                 sprintf(ficha[conta - 1].serie,"%s",linhas[2]);
+                 sprintf(ficha[conta - 1].pedido,"%s",linhas[3]);
+
+
+                 for(i=0;i<11;i++){
+                    switch(i){
+                        case 0:case 1:case 2: case 3:
+                            ficha[conta - 1].ano_encomenda[i] = linhas[4][i];
+                            break;
+                        case 4:
+                            ficha[conta - 1].ano_encomenda[i] = '\0';
+                            break;
+                        case 5:case 6:
+                            ficha[conta - 1].mes_encomenda[i - 5] = linhas[4][i];
+                            break;
+                        case 7:
+                            ficha[conta - 1].mes_encomenda[i - 5] = '\0';
+                            break;
+                        case 8:case 9:
+                            ficha[conta - 1].dia_encomenda[i - 8] = linhas[4][i];
+                            break;
+                        case 10:
+                            ficha[conta - 1].dia_encomenda[i - 8] = '\0';
+                    }
+                 }
+                 for(i=0;i<11;i++){
+                    switch(i){
+                        case 0:case 1:case 2: case 3:
+                            ficha[conta - 1].ano_entrega[i] = linhas[5][i];
+                            break;
+                        case 4:
+                            ficha[conta - 1].ano_entrega[i] = '\0';
+                            break;
+                        case 5:case 6:
+                            ficha[conta - 1].mes_entrega[i - 5] = linhas[5][i];
+                            break;
+                        case 7:
+                            ficha[conta - 1].mes_entrega[i - 5] = '\0';
+                            break;
+                        case 8:case 9:
+                            ficha[conta - 1].dia_entrega[i - 8] = linhas[5][i];
+                            break;
+                        case 10:
+                            ficha[conta - 1].dia_entrega[i - 8] = '\0';
+                    }
+                 }
+                sscanf(linhas[6],"%d",&ficha[conta - 1].tipo);
+                sscanf(linhas[7],"%d",&ficha[conta - 1].estado);
+                sscanf(linhas[8],"%d",&ficha[conta - 1].cliente);
+                sscanf(linhas[9],"%d",&ficha[conta - 1].categoria);
               }
           }
           mysql_free_result(resp);//limpa a variável do resultado: resp
@@ -789,8 +836,10 @@ void ligamysql(){
          printf("Erro %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
    }
 
-	return ;
+	return conta;
 }
+
+
 
 void enviarcadastro(char* query)
 {
