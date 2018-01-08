@@ -17,9 +17,10 @@ typedef struct{
 	char id[5], descricao[200], serie[5], pedido[5], ano_encomenda[5],dia_encomenda[3],mes_encomenda[3],ano_entrega[5],dia_entrega[3],mes_entrega[3];
 } retorn;
 
+
 void ligamysql();
 void imprimeMenu();
-void le(char* nome);
+int le(char* nome,int maxAux);
 void printOp(int opcao,int cor);
 void pulachar( int pula){
         int i;
@@ -180,6 +181,14 @@ void printOp(int opcao,int cor){
             gotoxy(11,9);
             printf("VOLTAR");
             break;
+        case 9:
+            gotoxy(20,9);
+            printf("SIM");
+            break;
+        case 10:
+            gotoxy(25,9);
+            printf("NÃO");
+            break;
     }
 }
 
@@ -199,7 +208,20 @@ void cadastros(){
                         cadastra();
                         break;
                     case 1:
-
+                        tamTerminal(50,10);
+                        cadCliente();
+                        break;
+                    case 2:
+                        tamTerminal(50,10);
+                        cadCategoria();
+                        break;
+                    case 3:
+                        tamTerminal(50,10);
+                        cadTipo();
+                        break;
+                    case 4:
+                        tamTerminal(50,10);
+                        cadEstado();
                         break;
                     case 5:
 
@@ -282,6 +304,290 @@ void cadastros(){
 
 }
 
+void cadCliente(){
+    char nome[100],ano[5],mes[3],dia[3];
+    char query[300],opcao;
+    int err=0,sair=0;
+INICIO:    system("cls");
+    textcolor(15);
+    textbackground(8);
+    pulachar(22);
+    printf("CLIENTE");
+    pulachar(22);
+    textbackground(9);
+    printf("\n\n NOME: ___________________________\n\n");
+    printf(" NASCIMENTO: __/__/____\n\n");
+    gotoxy(8,3);
+    if(le(nome,100))
+        goto RETORNAR;
+    gotoxy(14,5);
+    if(le(dia,2))
+        goto RETORNAR;
+    gotoxy(17,5);
+    if(le(mes,2))
+        goto RETORNAR;
+    gotoxy(20,5);
+    if(le(ano,4))
+        goto RETORNAR;
+    sprintf(query,"INSERT INTO cliente(nome,nascimento) values('%s','%s-%s-%s');",nome,ano,mes,dia);
+    gotoxy(13,7);
+    printf("OS DADOS ESTÃO CORRETOS?");
+    while(sair == 0){
+        switch(err){
+            case 0:
+                printOp(9,8);
+                printOp(10,9);
+                break;
+            case 1:
+                printOp(9,9);
+                printOp(10,8);
+                break;
+        }
+        opcao = getch();
+        switch(opcao){
+            case 13:
+                if(err == 1){
+                    err = 0;
+                    sair = 0;
+                    goto INICIO;
+                }
+                sair = 1;
+                break;
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        if(err < 1 )
+                            err++;
+                        else
+                            err=0;
+                        break;
+                    case '\x4b':
+                        if(err > 0 )
+                            err--;
+                        else
+                            err=1;
+                        break;
+                }
+        }
+
+
+    }
+
+enviarcadastro(query);
+RETORNAR: textcolor(7);
+textbackground(9);
+imprimeMenu2();
+tamTerminal(26,10);
+
+}
+
+void cadCategoria(){
+    char nome[30];
+    char query[300],opcao;
+    int err=0,sair=0;
+INICIO1:    system("cls");
+    textcolor(15);
+    textbackground(8);
+    pulachar(21);
+    printf("CATEGORIA");
+    pulachar(21);
+    textbackground(9);
+    printf("\n\n NOME: ___________________________\n\n");
+
+    gotoxy(8,3);
+    if(le(nome,29))
+        goto RETORNAR1;
+    sprintf(query,"INSERT INTO categoria(nome) values('%s');",nome);
+    gotoxy(13,7);
+    printf("OS DADOS ESTÃO CORRETOS?");
+    while(sair == 0){
+        switch(err){
+            case 0:
+                printOp(9,8);
+                printOp(10,9);
+                break;
+            case 1:
+                printOp(9,9);
+                printOp(10,8);
+                break;
+        }
+        opcao = getch();
+        switch(opcao){
+            case 13:
+                if(err == 1){
+                    err = 0;
+                    sair = 0;
+                    goto INICIO1;
+                }
+                sair = 1;
+                break;
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        if(err < 1 )
+                            err++;
+                        else
+                            err=0;
+                        break;
+                    case '\x4b':
+                        if(err > 0 )
+                            err--;
+                        else
+                            err=1;
+                        break;
+                }
+        }
+
+
+    }
+enviarcadastro(query);
+RETORNAR1: textbackground(9);
+textcolor(7);
+imprimeMenu2();
+tamTerminal(26,10);
+
+}
+
+void cadTipo(){
+    char nome[30];
+    char query[300],opcao;
+    int err=0,sair=0;
+INICIO2:    system("cls");
+    textcolor(15);
+    textbackground(8);
+    pulachar(18);
+    printf("TIPO DE PRODUÇÃO");
+    pulachar(17);
+    textbackground(9);
+    printf("\n\n NOME: ___________________________\n\n");
+
+    gotoxy(8,3);
+    if(le(nome,29))
+        goto RETORNAR2;
+    sprintf(query,"INSERT INTO tipo(nome) values('%s');",nome);
+    gotoxy(13,7);
+    printf("OS DADOS ESTÃO CORRETOS?");
+    while(sair == 0){
+        switch(err){
+            case 0:
+                printOp(9,8);
+                printOp(10,9);
+                break;
+            case 1:
+                printOp(9,9);
+                printOp(10,8);
+                break;
+        }
+        opcao = getch();
+        switch(opcao){
+            case 13:
+                if(err == 1){
+                    err = 0;
+                    sair = 0;
+                    goto INICIO2;
+                }
+                sair = 1;
+                break;
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        if(err < 1 )
+                            err++;
+                        else
+                            err=0;
+                        break;
+                    case '\x4b':
+                        if(err > 0 )
+                            err--;
+                        else
+                            err=1;
+                        break;
+                }
+        }
+
+
+    }
+
+enviarcadastro(query);
+RETORNAR2:textcolor(7);
+textbackground(9);
+imprimeMenu2();
+tamTerminal(26,10);
+
+}
+
+void cadEstado(){
+    char nome[30];
+    char query[300],opcao;
+    int err=0,sair=0;
+INICIO3:    system("cls");
+    textcolor(15);
+    textbackground(8);
+    pulachar(23);
+    printf("ESTADO");
+    pulachar(22);
+    textbackground(9);
+    printf("\n\n NOME: ___________________________\n\n");
+
+    gotoxy(8,3);
+    if(le(nome,29))
+        goto RETORNAR3;
+    sprintf(query,"INSERT INTO estado(nome) values('%s');",nome);
+    gotoxy(13,7);
+    printf("OS DADOS ESTÃO CORRETOS?");
+    while(sair == 0){
+        switch(err){
+            case 0:
+                printOp(9,8);
+                printOp(10,9);
+                break;
+            case 1:
+                printOp(9,9);
+                printOp(10,8);
+                break;
+        }
+        opcao = getch();
+        switch(opcao){
+            case 13:
+                if(err == 1){
+                    err = 0;
+                    sair = 0;
+                    goto INICIO3;
+                }
+                sair = 1;
+                break;
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        if(err < 1 )
+                            err++;
+                        else
+                            err=0;
+                        break;
+                    case '\x4b':
+                        if(err > 0 )
+                            err--;
+                        else
+                            err=1;
+                        break;
+                }
+        }
+
+
+    }
+
+enviarcadastro(query);
+RETORNAR3: textcolor(7);
+textbackground(9);
+imprimeMenu2();
+tamTerminal(26,10);
+
+}
+
 void consultas(){
 	ligamysql();
 	return;
@@ -298,36 +604,20 @@ void cadastra(){
 
 
     imprimeFicha();
-    textcolor(7);
-    getch();
-    le(ficha.descricao);
 
-    le(serie);
+    gotoxy(13,5);
+    le(ficha.descricao,199);
+    printf("\n%s",ficha.descricao);
+    gotoxy(9,7);
+    le(ficha.serie,4);
+
+/*
+
+	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%s-%s-%s','s-%s-%s','%s','%s','%s','%s');",ficha.descricao,ficha.serie,ficha.pedido,ficha.ano_encomenda,ficha.mes_encomenda,ficha.dia_encomenda,ficha.ano_entrega,ficha.mes_entrega,ficha.dia_entrega,ficha.tipo,ficha.estado,ficha.cliente,ficha.categoria);
 
 
-	fgets(pedido,5,stdin);
-	if(pedido[strlen(pedido) - 1] == '\n')
-		pedido[strlen(pedido) - 1] = '\0';
-	fflush(stdin);
-
-	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
-	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%4d-%02d-%02d','%4d-%02d-%02d','%d','%d','%d','%d');",ficha.descricao,ficha.serie,ficha.pedido,ficha.ano_encomenda,ficha.mes_encomenda,ficha.dia_encomenda,ficha.ano_entrega,ficha.mes_entrega,ficha.dia_entrega,ficha.tipo,ficha.estado,ficha.cliente,ficha.categoria);
-
-	scanf("%2d/%2d/%4d",&dia,&mes,&ano);
-
-	scanf("%d",&tipo);
-
-	scanf("%d",&estado);
-
-	scanf("%d",&cliente);
-
-	scanf("%d",&categoria);
-	sprintf(query,"%s,'%4d-%02d-%02d','%d','%d','%d','%d');",query,ano,mes,dia,tipo,estado,cliente,categoria);
-	system("cls");
-	printf("%s",query);
-	getch();
-	system("cls");
-	enviarcadastro(query);
+	enviarcadastro(query);*/
+	textcolor(7);
 	return;
 
 }
@@ -350,23 +640,27 @@ void imprimeFicha(){
 	printf(" CLIENTE: ________________________________________\n\n");
 }
 
-void le(char* nome){
+int le(char* nome,int maxAux){
 
     char caracter,car;
-    int aux = 0;
-    system("cls");
+    int aux = 0,comeco=1;
 
     do{
-
-        //scanf("%c%c",&car,&caracter);
         caracter = getch();
-
-        printf("%c",caracter);
-        //getch();
-        /*
         if (caracter != 13){
 
             switch(caracter){
+            case '\x1b':
+                return 1;
+                break;
+            case '\xe0':
+                caracter = getch();
+                    switch(caracter){
+                        case '\x4b':
+                            caracter = '\x08';
+                            break;
+                    }
+                break;
             case '\x87':
             case '\x80':
                 caracter = 'Ç';
@@ -413,12 +707,26 @@ void le(char* nome){
             default:
                 caracter = toupper(caracter);
             }
-            nome[aux] = caracter;
-            aux++;
-        }else
-            nome[aux]= '\0';*/
+            if(caracter != '\x08'){
+                nome[aux] = caracter;
+                aux++;
+                comeco = 0;
+            }else
 
-    }while (caracter != 13);
+                if (aux > 0){
+                    printf("\x08_");
+                    aux--;}
+                else
+                    comeco = 1;
+            if (comeco == 0)
+                putchar(caracter);
+        }else
+            nome[aux]= '\0';
+
+    }while (caracter != 13 && aux < maxAux);
+    if( aux == maxAux)
+        nome[maxAux]='\0';
+    return 0;
 }
 
 void ligamysql(){
@@ -496,15 +804,17 @@ void enviarcadastro(char* query)
 
         res = mysql_query(&conexao,query);
 
-        if (!res) printf("Registros inseridos %d\n", mysql_affected_rows(&conexao));
-        else printf("Erro na inserção %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
-
+        if (res){
+            printf("\nErro na inserção %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+            getch();
+        }
         mysql_close(&conexao);
     }
     else
     {
         printf("Falha de conexao\n");
         printf("Erro %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+        getch();
      }
-     getch();
+
 }
