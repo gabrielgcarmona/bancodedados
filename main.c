@@ -17,10 +17,18 @@ typedef struct{
 	char id[5], descricao[200], serie[5], pedido[5], ano_encomenda[5],dia_encomenda[3],mes_encomenda[3],ano_entrega[5],dia_entrega[3],mes_entrega[3];
 } retorn;
 
+typedef struct{
+    int id;
+    char nome[200];
+    char dia[3],mes[3],ano[5];
+} pesquisa;
 
 void ligamysql();
 void imprimeMenu();
+pesquisa* consulta(char * tabela,int*valor);
+
 int le(char* nome,int maxAux);
+retorn* consultaProduto(int*valor);
 void printOp(int opcao,int cor);
 void pulachar( int pula){
         int i;
@@ -590,10 +598,10 @@ tamTerminal(26,10);
 
 void consultas(){
     int consulta;
-    retorn* ficha=(retorn*) malloc(sizeof(retorn));
+    retorn* ficha;
 
     system("cls");
-	consulta = consultaProduto(ficha);
+	ficha = consultaProduto(&consulta);
 	if(consulta){
         printf("%d Registros encontrados\n",consulta);
         printf("Descrição: %s\n",ficha[0].descricao);
@@ -601,6 +609,7 @@ void consultas(){
         printf("Data de entrega: %s/%s/%s\n",ficha[0].dia_entrega,ficha[0].mes_entrega,ficha[0].ano_entrega);
         printf("Dados: %02d %02d %02d %02d",ficha[0].tipo,ficha[0].estado,ficha[0].cliente,ficha[0].categoria);
         getch();
+        free(ficha);
 
 	}
 
@@ -609,8 +618,9 @@ void consultas(){
 
 void cadastra(){
     retorn ficha;
+    pesquisa* cate;
 	char opcao ;
-	int ano,dia,mes;
+	int ano,dia,mes,conCate,aux=0;
 	int tipo,estado,cliente,categoria;
 	char query[300];
 	void enviarcadastro(char* query);
@@ -618,13 +628,51 @@ void cadastra(){
 
 
     imprimeFicha();
+    cate=consulta("categoria",&conCate);
 
+    do{
+        gotoxy(24,3);
+        pulachar(20);
+        gotoxy(24,3);
+        printf("< %s >",cate[aux].nome);
+        opcao = getch();
+        switch(opcao){
+            case '\xe0':
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        if(aux < conCate - 1)
+                            aux++;
+                        break;
+                    case '\x4b':
+                        if(aux > 0)
+                            aux--;
+                }
+                break;
+            case 8:
+                goto PULA;
+                break;
+            case 13:
+                ficha.categoria = cate[aux].id;
+
+        }
+
+
+    }while(opcao != 13);
     gotoxy(13,5);
     le(ficha.descricao,199);
-    printf("\n%s",ficha.descricao);
     gotoxy(9,7);
     le(ficha.serie,4);
-
+    gotoxy(11,9);
+    le(ficha.pedido,4);
+    gotoxy(21,11);
+    le(ficha.dia_encomenda,2);
+    gotoxy(24,11);
+    le(ficha.mes_encomenda,2);
+    gotoxy(27,11);
+    le(ficha.ano_encomenda,4);
+PULA:
+    free(cate);
 /*
 
 	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%s-%s-%s','s-%s-%s','%s','%s','%s','%s');",ficha.descricao,ficha.serie,ficha.pedido,ficha.ano_encomenda,ficha.mes_encomenda,ficha.dia_encomenda,ficha.ano_entrega,ficha.mes_entrega,ficha.dia_entrega,ficha.tipo,ficha.estado,ficha.cliente,ficha.categoria);
@@ -632,6 +680,7 @@ void cadastra(){
 
 	enviarcadastro(query);*/
 	textcolor(7);
+	tamTerminal(26,10);
 	return;
 
 }
@@ -643,7 +692,7 @@ void imprimeFicha(){
     pulachar(23);
     textbackground(9);
     textcolor(15);
-    printf("\n\n CATEGORIA DO PRODUTO: ___________________________\n\n");
+    printf("\n\n CATEGORIA DO PRODUTO: < >\n\n");
     printf(" DESCRIÇÃO: ______________________________________\n\n");
 	printf(" SÉRIE: ____\n\n");
 	printf(" N PEDIDO:____\n\n");
@@ -743,9 +792,9 @@ int le(char* nome,int maxAux){
     return 0;
 }
 
-int consultaProduto(retorn* ficha){
+retorn* consultaProduto(int*valor){
 
-
+    retorn* ficha =(retorn*) malloc(sizeof(retorn));
 	MYSQL conexao;
    	MYSQL_RES *resp;
    	MYSQL_ROW linhas;
@@ -835,8 +884,81 @@ int consultaProduto(retorn* ficha){
       if (mysql_errno(&conexao))
          printf("Erro %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
    }
+    *valor=conta;
+	return ficha;
+}
 
-	return conta;
+pesquisa* consulta(char * tabela,int*valor){
+
+    pesquisa* ficha =(pesquisa*) malloc(sizeof(pesquisa));
+	MYSQL conexao;
+   	MYSQL_RES *resp;
+   	MYSQL_ROW linhas;
+   	MYSQL_FIELD *campos;
+   	char query[100];
+   	int conta = 0,i=0; //Contador comum
+
+   	sprintf(query,"SELECT * FROM %s",tabela);
+
+
+
+   mysql_init(&conexao);
+   if (mysql_real_connect(&conexao,HOST,USER,PASS,DB,0,NULL,0))
+   {
+      if (mysql_query(&conexao,query))
+         printf("Erro: %s\n",mysql_error(&conexao));
+      else
+      {
+         resp = mysql_store_result(&conexao);//recebe a consulta
+        if (resp) //se houver consulta
+        {
+           campos = mysql_fetch_fields(resp);
+
+              while ((linhas=mysql_fetch_row(resp)) != NULL)
+              {
+                  conta++;
+                 ficha=(pesquisa*)realloc(ficha,conta * sizeof(pesquisa));
+                 sscanf(linhas[0],"%d",&ficha[conta - 1].id);
+                 sprintf(ficha[conta - 1].nome,"%s",linhas[1]);
+
+
+                if(mysql_num_fields(resp) == 3)
+                 for(i=0;i<11;i++){
+                    switch(i){
+                        case 0:case 1:case 2: case 3:
+                            ficha[conta - 1].ano[i] = linhas[3][i];
+                            break;
+                        case 4:
+                            ficha[conta - 1].ano[i] = '\0';
+                            break;
+                        case 5:case 6:
+                            ficha[conta - 1].mes[i - 5] = linhas[3][i];
+                            break;
+                        case 7:
+                            ficha[conta - 1].mes[i - 5] = '\0';
+                            break;
+                        case 8:case 9:
+                            ficha[conta - 1].dia[i - 8] = linhas[3][i];
+                            break;
+                        case 10:
+                            ficha[conta - 1].dia[i - 8] = '\0';
+                    }
+                 }
+
+              }
+          }
+          mysql_free_result(resp);//limpa a variável do resultado: resp
+        }
+        mysql_close(&conexao);
+   }
+   else
+   {
+      printf("Conexao Falhou\n");
+      if (mysql_errno(&conexao))
+         printf("Erro %d : %s\n", mysql_errno(&conexao), mysql_error(&conexao));
+   }
+    *valor=conta;
+	return ficha;
 }
 
 
