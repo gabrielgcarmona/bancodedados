@@ -739,25 +739,80 @@ void cadastra(){
                 break;
             case 13:
                 ficha.estado = cate[aux].id;
-
         }
-
-
     }while(opcao != 13);
+    free(cate);
+    ficha.cliente=escolheCliente(cate,&conCate);
+    sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%s-%s-%s','%s-%s-%s','%d','%d','%d','%d');",ficha.descricao,ficha.serie,ficha.pedido,ficha.ano_encomenda,ficha.mes_encomenda,ficha.dia_encomenda,ficha.ano_entrega,ficha.mes_entrega,ficha.dia_entrega,ficha.tipo,ficha.estado,ficha.cliente,ficha.categoria);
 
+
+	enviarcadastro(query);
 
 PULA:
     free(cate);
-/*
-
-	sprintf(query,"INSERT INTO produto(descricao,serie,pedido,data_encomenda,data_entrega,id_tipo,id_estado,id_cliente,id_categoria) values('%s','%s','%s','%s-%s-%s','s-%s-%s','%s','%s','%s','%s');",ficha.descricao,ficha.serie,ficha.pedido,ficha.ano_encomenda,ficha.mes_encomenda,ficha.dia_encomenda,ficha.ano_entrega,ficha.mes_entrega,ficha.dia_entrega,ficha.tipo,ficha.estado,ficha.cliente,ficha.categoria);
-
-
-	enviarcadastro(query);*/
 	textcolor(7);
 	tamTerminal(26,10);
 	imprimeMenu2();
 	return;
+
+}
+int escolheCliente(pesquisa* ponteiro,int* qtd){
+
+    int sair=0,err=0,i;
+    char opcao,inteiro[4];
+    ponteiro=consulta("cliente",qtd);
+    system("cls");
+    printf("CADASTRAR NOVO CLIENTE?");
+    do{
+        switch(err){
+            case 0:
+                gotoxy(20,3);
+                textbackground(8);
+                printf("SIM");
+                textbackground(9);
+                gotoxy(27,3);
+                printf("NÃO");
+                break;
+            case 1:
+                gotoxy(20,3);
+                printf("SIM");
+                textbackground(8);
+                gotoxy(27,3);
+                printf("NÃO");
+                textbackground(9);
+                break;
+        }
+        opcao = getch();
+        switch(opcao){
+            case -32:
+                opcao = getch();
+                switch(opcao){
+                    case '\x4d':
+                        err=1;
+                        break;
+                    case '\x4b':
+                        err=0;
+                        break;
+                }
+        }
+    }while(opcao != 13);
+        if(err == 0){
+            cadCliente();
+            err=ponteiro[*qtd - 1].id + 1;
+            free(ponteiro);
+            return err;
+
+
+        }
+        system("cls");
+        printf("ID\tCLIENTE\n\n");
+        for(i=0;i<*qtd;i++)
+            printf("%2d\t%s\n",ponteiro[i].id,ponteiro[i].nome);
+        free(ponteiro);
+        printf("\nDIGITE O ID DO CLIENTE: ");
+        scanf("%d",&sair);
+        return sair;
+
 
 }
 void imprimeFicha(){
